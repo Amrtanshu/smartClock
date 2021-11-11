@@ -1,0 +1,58 @@
+<LabelHuge@Label>:
+     font_name: 'Roboto'
+     font_size: 200
+
+<LabelBig@Label>:
+     font_name: 'Roboto'
+     font_size: 100
+
+<LabelMedium@Label>:
+     font_name: 'Roboto'
+     font_size: 40
+
+<LabelSmall@Label>:
+     font_name: 'Roboto'
+     font_size: 20
+
+BoxLayout:
+     orientation: 'vertical'
+     padding: 20
+     margins: 0
+
+
+     BoxLayout:
+
+          LabelHuge:
+               id: time
+               text: '00:00'
+               size_hint: (.7, None)
+
+          LabelBig:
+               id: ampm
+               text: 'AM'
+               size_hint: (.3, None)
+               text_size: self.size
+               halign: 'left'
+               valign: 'bottom'
+               bold: True
+
+     
+     LabelMedium:
+          id: date
+          text: '00/00/0000'
+
+
+     BoxLayout:
+
+
+          LabelSmall:
+               id: ongoingEvent     
+               text: 'Ongoing - Study'
+
+          LabelSmall:         
+               id: useless     
+               text: '     '
+
+          LabelSmall:
+               id: ongoingEvent     
+               text: 'Upcoming - Break'
