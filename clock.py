@@ -14,7 +14,7 @@ class clockApp(App):
         self.root.ids.time.text = strftime('%I:%M')
         self.root.ids.ampm.text = strftime('%p')
 
-        self.root.ids.date.text = strftime('%m/%d/%Y')
+        self.root.ids.date.text = strftime('%m/%d/%Y - %A')
 
     def on_start(self):
         Clock.schedule_interval(self.update_time, 0)

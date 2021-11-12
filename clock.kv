@@ -1,18 +1,22 @@
 <LabelHuge@Label>:
      font_name: 'Roboto'
      font_size: 200
+     markup: True
 
 <LabelBig@Label>:
      font_name: 'Roboto'
      font_size: 100
+     markup: True
 
 <LabelMedium@Label>:
      font_name: 'Roboto'
      font_size: 40
+     markup: True
 
 <LabelSmall@Label>:
      font_name: 'Roboto'
      font_size: 20
+     markup: True
 
 BoxLayout:
      orientation: 'vertical'
@@ -33,26 +37,22 @@ BoxLayout:
                size_hint: (.3, None)
                text_size: self.size
                halign: 'left'
-               valign: 'bottom'
                bold: True
 
      
      LabelMedium:
           id: date
-          text: '00/00/0000'
-
+          text: '00/00/0000 - Monday'
 
      BoxLayout:
-
+          padding: 40
+          halign: 'Top'
 
           LabelSmall:
                id: ongoingEvent     
                text: 'Ongoing - Study'
 
-          LabelSmall:         
-               id: useless     
-               text: '     '
 
           LabelSmall:
-               id: ongoingEvent     
+               id: upcomingEvent     
                text: 'Upcoming - Break'
