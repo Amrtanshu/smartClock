@@ -4,8 +4,10 @@ from kivy.clock import Clock
 from kivy.core.text import LabelBase
 from kivy.core.window import Window
 from kivy.utils import get_color_from_hex
+from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 
-Window.size = (800, 480)
+
+Window.size = (720, 480)
 Window.borderless = True
 
 class clockApp(App):
