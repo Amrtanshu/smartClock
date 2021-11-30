@@ -17,6 +17,7 @@ import pickle
 Window.size = (720, 480)
 Window.borderless = True
 Window.fullscreen = True
+Window.show_cursor = False
 
 c1 = calendar()
 sch = c1.getEvents(strftime('%Y-%m-%d'))
