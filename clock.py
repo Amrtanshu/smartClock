@@ -169,7 +169,7 @@ class pomodoroScreen(Screen):
 
     def on_pre_enter(self):
 
-        with open(str(Path.home())+'dev/smartClock/settings.txt', 'rb') as f:
+        with open(str(Path.home())+'/dev/smartClock/settings.txt', 'rb') as f:
             settings = pickle.load(f)
             self.pomo_time = settings['pomo_time']
             self.break_time = settings['break_time']
@@ -193,14 +193,14 @@ class configScreen(Screen):
 
         settings = {'pomo_time':int(self.ids.confdur.text),'break_time':int(self.ids.confbreak.text),'long_break':int(self.ids.conflbreak.text)}
 
-        file = open(str(Path.home())+'dev/smartClock/settings.txt', 'wb')
+        file = open(str(Path.home())+'/dev/smartClock/settings.txt', 'wb')
         pickle.dump(settings, file)
         file.close()
         self.parent.current = 'pomo'
 
 
     def on_pre_enter(self):
-        with open(str(Path.home())+'dev/smartClock/settings.txt', 'rb') as f:
+        with open(str(Path.home())+'/dev/smartClock/settings.txt', 'rb') as f:
             settings = pickle.load(f)
             self.ids.sliderdur.value = settings['pomo_time']
             self.ids.sliderbreak.value = settings['break_time']
