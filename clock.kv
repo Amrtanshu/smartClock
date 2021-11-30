@@ -19,43 +19,256 @@
      markup: True
 
 
-<>
+<ButtonNormal@Button>
+     font_name: 'Roboto'
+     font_size: 50
+     background_color: (0.0, 0.0, 0.0, 0)
+     size: (50,100)   
 
-BoxLayout:
-     orientation: 'vertical'
-     padding: 20
-     margins: 0
+<ButtonSmall@Button>
+     font_name: 'Roboto'
+     font_size: 30
+     background_color: (0.0, 0.0, 0.0, 0)
+     size: (50,100)       
+
+
+
+
+<mainScreen>:
+
+     BoxLayout:
+          orientation: 'vertical'
+          padding: 0
+          margins: 0
+
+
+          BoxLayout:
+               size_hint: (1,.4)
+
+               LabelHuge:
+                    id: time
+                    size_hint: (.75, 1)
+
+               LabelBig:
+                    id: ampm
+                    size_hint: (.25, 1)
+                    text_size: self.size
+                    halign: 'left'
+                    bold: True
+
+          
+          LabelMedium:
+               id: date
+               size_hint: (1,.3)
+
+
+          GridLayout:
+               cols: 3
+               size_hint: (1,.2)
+               row_force_default: True
+               row_default_height: 40
+
+
+               LabelSmall:    
+                    text: 'Ongoing:'
+
+
+               LabelSmall:
+                    id: ongoingEvent     
+
+               LabelSmall:
+                    id: ongoingTime     
+
+
+               LabelSmall:    
+                    text: 'Next:'
+
+
+
+               LabelSmall:
+                    id: nextEvent     
+
+               LabelSmall:
+                    id: nextTime     
+
+          ButtonSmall:
+               size_hint: (1,.2)
+               on_release: app.root.current = 'menu'
+               text: 'Menu'
+
+
+
+
+<menuScreen>:
+
+     GridLayout:
+          cols: 2
+          padding: 40
+
+          ButtonNormal:
+               on_release: app.root.current = 'calendar'
+               text: 'Calendar'
+          ButtonNormal:
+               on_release: app.root.current = 'pomo'
+               text: 'Pomodoro'
+          ButtonNormal:
+               on_release: app.root.current = 'tasks'
+               text: 'Tasks'
+          ButtonNormal:
+               on_release: app.root.current = 'home'
+               text: 'Home'
+
+<pomodoroScreen>:
 
 
      BoxLayout:
+          orientation: 'vertical'
+          padding: 0
+          margins: 0
+
 
           LabelHuge:
-               id: time
-               text: '00:00'
-               size_hint: (.7, None)
+               id: pomoTime
+               text: '0:00:00'
+               font_size: 180
+               size_hint: (1,.4)
 
-          LabelBig:
-               id: ampm
-               text: 'AM'
-               size_hint: (.3, None)
-               text_size: self.size
-               halign: 'left'
-               bold: True
 
-     
-     LabelMedium:
-          id: date
-          text: '00/00/0000 - Monday'
 
+
+
+          LabelMedium:
+               id: pomoCount
+               text: 'Count - 0'
+               size_hint: (1,.2)
+          
+
+          
+          BoxLayout:
+               orientation: 'horizontal'
+               size_hint: (1,.2)
+               row_force_default: True
+               row_default_height: 40
+
+
+               ButtonSmall:
+                    id: pomobutton1
+                    text: 'Start'
+                    on_press: root.button1_press()
+
+               ButtonSmall:
+                    id: pomobutton2
+                    text: 'Reset'
+                    on_press: root.button2_press()
+
+
+               ButtonSmall:
+                    id: pomobutton3
+                    text: 'Settings'
+                    on_press: root.button3_press()
+  
+          ButtonSmall:
+               size_hint: (1,.2)
+               on_release: app.root.current = 'home'
+               text: 'Home'
+
+
+
+
+
+
+<calendarScreen>:
+
+     ButtonNormal:
+          on_release: app.root.current = 'home'
+          text: 'Home'
+
+
+
+<taskScreen>:
+
+     ButtonNormal:
+          on_release: app.root.current = 'home'
+          text: 'Home'
+
+
+<configScreen>:
      BoxLayout:
-          padding: 40
-          halign: 'Top'
-
-          LabelSmall:
-               id: ongoingEvent     
-               text: 'Ongoing - Study'
+          orientation: 'vertical'
+          padding: 0
+          margins: 0
 
 
-          LabelSmall:
-               id: upcomingEvent     
-               text: 'Upcoming - Break'
+          GridLayout:
+               cols: 3
+               padding:40
+
+
+
+               LabelSmall:    
+                    text: 'Duration'
+               Slider:
+                    id : sliderdur
+               
+                    orientation: "horizontal"
+                    min: 5  # minimum value of Slider
+                    max: 90 # maximum value of Slider
+                    value: 25  # initial value of Slider
+
+                    # when slider moves then to increase value
+                    on_value:confdur.text = str(int(self.value))
+               LabelSmall:
+                    id:  confdur     
+
+
+
+               LabelSmall:    
+                    text: 'Break'
+
+               Slider:
+                    id : sliderbreak
+               
+                    orientation: "horizontal"
+                    min: 1  # minimum value of Slider
+                    max: 20 # maximum value of Slider
+                    value: 5  # initial value of Slider
+
+                    # when slider moves then to increase value
+                    on_value:confbreak.text = str(int(self.value))
+
+               LabelSmall:
+                    id:  confbreak     
+                    text: '5'
+
+                    
+               LabelSmall:    
+                    text: 'Long Break'
+
+               Slider:
+                    id : sliderlbreak
+
+                    orientation: "horizontal"
+                    min: 5  # minimum value of Slider
+                    max: 60 # maximum value of Slider
+                    value: 15  # initial value of Slider
+
+                    # when slider moves then to increase value
+                    on_value:conflbreak.text = str(int(self.value))
+
+               LabelSmall:
+                    id:  conflbreak     
+                    text: '15'
+
+          GridLayout:
+               cols: 2
+
+               ButtonSmall:
+                    size_hint: (1,.2)
+                    on_release: root.configure_pomo()
+                    text: 'Save'
+
+               ButtonSmall:
+                    size_hint: (1,.2)
+                    on_release: app.root.current = 'pomo'
+                    text: 'Cancel'
+
