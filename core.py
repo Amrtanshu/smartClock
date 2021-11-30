@@ -50,7 +50,7 @@ class calendar:
 			with open('data.json', 'r', encoding='utf-8') as f:
 				schedule = json.load(f)
 				lastUpdate = datetime.fromisoformat(schedule['lastUpdate'])
-				if(datetime.now()>lastUpdate+timedelta(seconds = 3600)):
+				if((datetime.now()>lastUpdate+timedelta(seconds = 3600)) or datetime.now().date()!=lastUpdate.date()):
 					params = dict(
 						action="schedule",
 						day=date
