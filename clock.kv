@@ -10,12 +10,12 @@
 
 <LabelMedium@Label>:
      font_name: 'Roboto'
-     font_size: 50
+     font_size: 60
      markup: True
 
 <LabelSmall@Label>:
      font_name: 'Roboto'
-     font_size: 30
+     font_size: 40
      markup: True
 
 
@@ -178,6 +178,23 @@
 
 
 <calendarScreen>:
+
+     ButtonNormal:
+          on_release: app.root.current = 'home'
+          text: 'Home'
+
+
+<notificationScreen>:
+
+     LabelMedium:
+          id: notification
+          size_hint: (1,.2)
+
+     LabelMedium:
+          id: startsin
+          size_hint: (1,.2)
+   
+
 
      ButtonNormal:
           on_release: app.root.current = 'home'

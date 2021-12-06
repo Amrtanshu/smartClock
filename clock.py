@@ -13,10 +13,12 @@ from datetime import datetime, timedelta
 from core import calendar
 from pathlib import Path
 import pickle
+from gpiozero import Buzzer
+from time import sleep
 
 
 
-Window.size = (720, 480)
+Window.size = (800, 480)
 Window.borderless = True
 Window.fullscreen = True
 Window.show_cursor = False
@@ -24,12 +26,15 @@ Window.show_cursor = False
 c1 = calendar()
 sch = c1.getEvents(strftime('%Y-%m-%d'))
 
+buzzer = Buzzer(17)
+
+
+
 class mainScreen(Screen):
     def update_time(self, nap):
         time = datetime.now()
 
         curr_event = c1.getCurrentEvent(time)
-        next_event = c1.getNextEvent(curr_event[0])
 
         self.ids.time.text = strftime('%I:%M')
         self.ids.ampm.text = strftime('%p')
@@ -39,11 +44,23 @@ class mainScreen(Screen):
         if (len(curr_event)>0):
             self.ids.ongoingEvent.text = curr_event[0].title
             self.ids.ongoingTime.text = curr_event[0].start.strftime('%I:%M') + " - " + curr_event[0].end.strftime('%I:%M')
+            next_event = c1.getNextEvent(curr_event[0])
+
+            if (time < curr_event[0].start + timedelta(seconds = 5)):
+                buzzer.on()
+                sleep(2)
+                buzzer.off()
+                sleep(1)
+                buzzer.on()
+                sleep(2)
+                buzzer.off()
         
         if (len(next_event)>0):
             self.ids.nextEvent.text = next_event[0].title
             self.ids.nextTime.text = next_event[0].start.strftime('%I:%M') + " - " + next_event[0].end.strftime('%I:%M')
 
+        if (time.minute < 1):
+            sch = c1.getEvents(strftime('%Y-%m-%d'))
 
     def on_pre_enter(self):
         Clock.schedule_once(self.update_time)
