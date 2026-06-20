@@ -10,14 +10,13 @@
 
 <LabelMedium@Label>:
      font_name: 'Roboto'
-     font_size: 50
+     font_size: 60
      markup: True
 
 <LabelSmall@Label>:
      font_name: 'Roboto'
-     font_size: 30
+     font_size: 40
      markup: True
-
 
 <ButtonNormal@Button>
      font_name: 'Roboto'
@@ -30,8 +29,6 @@
      font_size: 30
      background_color: (0.0, 0.0, 0.0, 0)
      size: (50,100)       
-
-
 
 
 <mainScreen>:
@@ -81,7 +78,7 @@
 
 
                LabelSmall:    
-                    text: 'Next:'
+                    text: 'Upcoming:'
 
 
 
@@ -96,25 +93,34 @@
                on_release: app.root.current = 'menu'
                text: 'Menu'
 
-
-
-
 <menuScreen>:
 
-     GridLayout:
-          cols: 2
-          padding: 40
+     BoxLayout:
+          orientation: 'vertical'
+          padding: 0
+          margins: 0
+
+          GridLayout:
+               cols: 2
+               padding: 40
+
+               ButtonNormal:
+                    on_release: app.root.current = 'calendar'
+                    text: 'Calendar'
+               ButtonNormal:
+                    on_release: app.root.current = 'pomo'
+                    text: 'Pomodoro'
+               ButtonNormal:
+                    on_release: app.root.current = 'tasks'
+                    text: 'Tasks'
+               ButtonNormal:
+                    on_press: root.computerWakeup()
+                    text: 'PC Wakeup'
+
+
 
           ButtonNormal:
-               on_release: app.root.current = 'calendar'
-               text: 'Calendar'
-          ButtonNormal:
-               on_release: app.root.current = 'pomo'
-               text: 'Pomodoro'
-          ButtonNormal:
-               on_release: app.root.current = 'tasks'
-               text: 'Tasks'
-          ButtonNormal:
+               size_hint: (1,.2)
                on_release: app.root.current = 'home'
                text: 'Home'
 
@@ -134,15 +140,16 @@
                size_hint: (1,.4)
 
 
-
-
-
           LabelMedium:
                id: pomoCount
                text: 'Count - 0'
                size_hint: (1,.2)
           
 
+          LabelSmall:
+               id: pomoTimeCurrent
+               size_hint: (1,.2)
+          
           
           BoxLayout:
                orientation: 'horizontal'
@@ -150,6 +157,9 @@
                row_force_default: True
                row_default_height: 40
 
+               ButtonSmall:
+                    on_release: app.root.current = 'home'
+                    text: 'Home'
 
                ButtonSmall:
                     id: pomobutton1
@@ -167,30 +177,77 @@
                     text: 'Settings'
                     on_press: root.button3_press()
   
+<calendarScreen>:
+
+     BoxLayout:
+          orientation: 'vertical'
+          padding: 10
+          margins: 0
+
+
+          LabelSmall:
+               id: calendarDate
+               size_hint: (1,.2)
+               margin: 10
+
+
+
+          ScrollView:
+               do_scroll_x: False
+               do_scroll_y: True
+               id: calendarscroll
+
+          BoxLayout:
+               orientation: 'horizontal'
+               size_hint: (1,.2)
+               row_force_default: True
+               row_default_height: 40
+               margin: 10
+
+
+               ButtonSmall:
+                    on_release: app.root.current = 'home'
+                    text: 'Home'
+
+               ButtonSmall:
+                    id: pomobutton3
+                    text: 'Previous'
+                    on_press: root.createPreviousCalendar()
+
+
+               ButtonSmall:
+                    id: pomobutton2
+                    text: 'Today'
+                    on_press: root.createTodayCalendar()
+
+               ButtonSmall:
+                    id: pomobutton1
+                    text: 'Next'
+                    on_press: root.createNextCalendar()
+
+<taskScreen>:
+
+     BoxLayout:
+          orientation: 'vertical'
+          padding: 10
+          margins: 0
+
+
+          LabelSmall:
+               text: 'Study Plan'
+               size_hint: (1,.2)
+               margin: 10
+
+          ScrollView:
+               do_scroll_x: False
+               do_scroll_y: True
+               id: tasksscroll
+
+
           ButtonSmall:
                size_hint: (1,.2)
                on_release: app.root.current = 'home'
                text: 'Home'
-
-
-
-
-
-
-<calendarScreen>:
-
-     ButtonNormal:
-          on_release: app.root.current = 'home'
-          text: 'Home'
-
-
-
-<taskScreen>:
-
-     ButtonNormal:
-          on_release: app.root.current = 'home'
-          text: 'Home'
-
 
 <configScreen>:
      BoxLayout:

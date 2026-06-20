@@ -3,47 +3,84 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.text import LabelBase
 from kivy.core.window import Window
+from kivy.uix.scrollview import ScrollView
 from kivy.utils import get_color_from_hex
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
 
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+
+
 
 from datetime import datetime, timedelta
-from core import calendar
+import pytz
+from core import *
 from pathlib import Path
 import pickle
+from gpiozero import Buzzer
+from time import sleep
+
+from wakeonlan import send_magic_packet
 
 
 
-Window.size = (720, 480)
+Window.size = (800, 480)
 Window.borderless = True
 Window.fullscreen = True
 Window.show_cursor = False
 
-c1 = calendar()
-sch = c1.getEvents(strftime('%Y-%m-%d'))
+# c1 = calendar()
+# sch = c1.getEvents(strftime('%Y-%m-%d'))
+initialize()
+calendarToday = calendar()
+calendarToday.updateCurrAndNextEvents()
+
+tasks = tasks()
+
+buzzer = Buzzer(17)
+
+
 
 class mainScreen(Screen):
     def update_time(self, nap):
-        time = datetime.now()
+        time = datetime.now(pytz.timezone(calendarToday.timeZone))
 
-        curr_event = c1.getCurrentEvent(time)
-        next_event = c1.getNextEvent(curr_event[0])
+        # curr_event = c1.getCurrentEvent(time)
 
         self.ids.time.text = strftime('%I:%M')
         self.ids.ampm.text = strftime('%p')
-
         self.ids.date.text = strftime('%d/%m/%Y - %A')
 
-        if (len(curr_event)>0):
-            self.ids.ongoingEvent.text = curr_event[0].title
-            self.ids.ongoingTime.text = curr_event[0].start.strftime('%I:%M') + " - " + curr_event[0].end.strftime('%I:%M')
-        
-        if (len(next_event)>0):
-            self.ids.nextEvent.text = next_event[0].title
-            self.ids.nextTime.text = next_event[0].start.strftime('%I:%M') + " - " + next_event[0].end.strftime('%I:%M')
 
+        if calendarToday.currentEvent is not None:
+            self.ids.ongoingEvent.text = calendarToday.currentEvent.title
+            self.ids.ongoingTime.text = calendarToday.currentEvent.start.strftime('%I:%M') + " - " + calendarToday.currentEvent.end.strftime('%I:%M')
+            if (time < calendarToday.currentEvent.start + timedelta(seconds=5)):
+                buzzer.on()
+                sleep(2)
+                buzzer.off()
+                sleep(1)
+                buzzer.on()
+                sleep(2)
+                buzzer.off()
+
+        else:   
+            self.ids.ongoingEvent.text = ""
+            self.ids.ongoingTime.text = ""
+
+
+        self.ids.nextEvent.text = calendarToday.nextEvent.title
+        self.ids.nextTime.text = calendarToday.nextEvent.start.strftime('%I:%M') + " - " + calendarToday.nextEvent.end.strftime('%I:%M')
+
+        if calendarToday.currentEvent is not None:
+            if calendarToday.currentEvent.end < time :
+                calendarToday.updateCurrAndNextEvents()
+        else:
+            if calendarToday.lastUpdateTime + timedelta(minutes = 15) < time:
+                calendarToday.updateCurrAndNextEvents()
 
     def on_pre_enter(self):
         Clock.schedule_once(self.update_time)
@@ -53,7 +90,11 @@ class mainScreen(Screen):
 
 
 class menuScreen(Screen):
-    pass
+    
+    def computerWakeup(self):
+        send_magic_packet('70:8B:CD:0C:42:A5',ip_address = '192.168.1.255')
+        print('woken')
+
 
 
 
@@ -71,13 +112,17 @@ class pomodoroScreen(Screen):
 
     def update_pomo(self,nap):
 
+        self.ids.pomoTimeCurrent.text = strftime('%I:%M %p') + " - " + calendarToday.currentEvent.title
         self.ids.pomoCount.text = self.status_name[self.status-1] + ' || Count - '+ str(self.pomo_count)
 
 
         if self.status == 4:
             timeleft = self.end_time - datetime.now()
             if timeleft.seconds <=0:
-                self.pomo_count = self.pomo_count + 1
+                self.pomo_count = self.pomo_count
+                buzzer.on()
+                sleep(0.5)
+                buzzer.off()
                 self.button2_press()
 
             else:
@@ -88,6 +133,9 @@ class pomodoroScreen(Screen):
 
             if timeleft.seconds <=0:
                 self.pomo_count = self.pomo_count + 1
+                buzzer.on()
+                sleep(0.5)
+                buzzer.off()
                 self.button3_press()
             else:
                 self.ids.pomoTime.text = (str(timeleft).split('.')[0])
@@ -183,11 +231,80 @@ class pomodoroScreen(Screen):
 
 
 class calendarScreen(Screen):
-    pass
+    displayDate = date.today()
+
+    def createCalendar(self):
+        self.ids.calendarscroll.clear_widgets()
+        queryDate = self.displayDate
+        events = calendarToday.getEvents(queryDate)
+        layout = GridLayout(cols=2, spacing=10, size_hint_y=None)
+        # Make sure the height is such that there is something to scroll.
+        layout.bind(minimum_height=layout.setter('height'))
+        for ent in events:
+            timeStr= ent.start.strftime('%I:%M') + " - " + ent.end.strftime('%I:%M')
+            lbl = Label(text=ent.title, size_hint_y=None, height=50,font_name = 'Roboto', font_size = 40,size_hint_x=.7)
+            layout.add_widget(lbl)
+            lbl = Label(text=timeStr, size_hint_y=None, height=50,font_name = 'Roboto', font_size = 40)
+            layout.add_widget(lbl)
+    
+        
+        self.ids.calendarscroll.add_widget(layout)
+        self.ids.calendarDate.text = self.displayDate.strftime('%d/%m/%Y - %A')
+
+
+    def on_pre_enter(self):
+        self.createCalendar()
+
+    def createNextCalendar(self):
+        self.displayDate = self.displayDate + timedelta(days=1)
+        self.createCalendar()
+
+    def createPreviousCalendar(self):
+        self.displayDate = self.displayDate - timedelta(days=1)
+        self.createCalendar()
+
+    def createTodayCalendar(self):
+        self.displayDate = date.today()
+        self.createCalendar()
+
+
+
+
+
 
 
 class taskScreen(Screen):
-    pass
+    def createTasks(self):
+        self.ids.tasksscroll.clear_widgets()
+        taskList = tasks.getTasks()
+        layout = GridLayout(cols=2, spacing=10, size_hint_y=None)
+        # Make sure the height is such that there is something to scroll.
+        layout.bind(minimum_height=layout.setter('height'))
+        for tsk in taskList:
+
+            if tsk.due == "":
+                taskDue = "-" 
+            else:
+                taskDue = tsk.due.strftime('%d/%m(%a)')
+
+            if tsk.status == 'completed':
+                taskTitle = "[s]" + tsk.title + "[/s]"
+                taskDue = "[s]" + taskDue + "[/s]"
+            else:
+                taskTitle = tsk.title
+
+            lbl = Label(text=taskTitle, size_hint_y=None, height=50,font_name = 'Roboto', font_size = 40,size_hint_x=.9,markup = True)
+            layout.add_widget(lbl)
+            lbl = Label(text=taskDue, size_hint_y=None, height=50,font_name = 'Roboto', font_size = 40)
+            layout.add_widget(lbl)
+            
+        self.ids.tasksscroll.add_widget(layout)
+
+    def on_pre_enter(self):
+        self.createTasks()
+
+
+
 
 class configScreen(Screen):
     def configure_pomo(self):
@@ -206,9 +323,6 @@ class configScreen(Screen):
             self.ids.sliderdur.value = settings['pomo_time']
             self.ids.sliderbreak.value = settings['break_time']
             self.ids.sliderlbreak.value = settings['long_break']
-
-
-
 
 
 class clockApp(App):
