@@ -38,11 +38,14 @@ class task():
 		params = dict(
 			action = doAction,
 			taskid = self.taskid)
-		resp = requests.post(url,params = param)
+		resp = requests.post(url,params = param, timeout=10)
 
 
 
 class calendar:
+
+	def __init__(self):
+    	self.events = []
 
 	def getEvents(self,date):
 
@@ -56,7 +59,7 @@ class calendar:
 						day=date
 						)
 
-					resp = requests.get(url,params = params);
+					resp = requests.get(url,params = params, timeout=10);
 					schedule = resp.json()
 					schedule['lastUpdate'] = datetime.now().isoformat()
 					print("updated")
@@ -71,7 +74,7 @@ class calendar:
 						day=date
 						)
 
-			resp = requests.get(url,params = params);
+			resp = requests.get(url,params = params, timeout=10);
 			schedule = resp.json()
 			schedule['lastUpdate'] = datetime.now().isoformat()
 
@@ -111,7 +114,7 @@ class tasks:
 		params = dict(
 			action="tasks",
 		)
-		resp = requests.get(url,params = params);
+		resp = requests.get(url,params = params, timeout=10);
 		tasklists = resp.json()
 		tasklists = tasklists["tasks"]
 		tasks = [];

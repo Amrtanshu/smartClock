@@ -24,8 +24,11 @@ Window.fullscreen = True
 Window.show_cursor = False
 
 c1 = calendar()
-sch = c1.getEvents(strftime('%Y-%m-%d'))
-
+try:
+    sch = c1.getEvents(strftime('%Y-%m-%d'))
+except Exception as e:
+    print(f"Initial calendar load failed: {e}")
+    sch = []
 buzzer = Buzzer(17)
 
 
@@ -59,8 +62,11 @@ class mainScreen(Screen):
             self.ids.nextEvent.text = next_event[0].title
             self.ids.nextTime.text = next_event[0].start.strftime('%I:%M') + " - " + next_event[0].end.strftime('%I:%M')
 
-        if (time.minute < 1):
-            sch = c1.getEvents(strftime('%Y-%m-%d'))
+        if time.second % 10 == 0:
+            try:
+                sch = c1.getEvents(strftime('%Y-%m-%d'))
+            except Exception as e:
+                print(f"Calendar refresh failed: {e}")
 
     def on_pre_enter(self):
         Clock.schedule_once(self.update_time)
